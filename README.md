@@ -11,7 +11,11 @@ Works on both Neovim 0.9+ and 0.10+.
 - Press the same key again to **stop** speaking
 - Uses macOS `say` (preferred) or falls back to `osascript` if needed
 - Integrates with both `vim.system()` (Neovim 0.10+) and `jobstart()` (0.9+)
-- Clean Lua implementation, ~200 lines of code, easy to customize
+- Minimal implementation, ~200 lines of code, easy to customize
+
+## Requirements
+- Neovim 0.9+
+- macOS
 
 ## Installation
 
@@ -20,13 +24,22 @@ Works on both Neovim 0.9+ and 0.10+.
 ```lua
 {
   "nicholasmata/sayit.nvim",
-  opts = {
-    mappings = {
-      normal = "<leader>v",
-      visual = "<leader>v",
-      stop   = "<leader>V", -- optional dedicated stop key
-    },
-    exit_visual = true,     -- exit visual mode after speaking (default `true`)
-  },
+  opts = {}
 }
 ```
+
+## Configuration
+
+The example below shows all the possible configurations (with there defaults):
+```lua
+{
+  mappings = {
+    normal = "<leader>v", -- keybinding when in normal mode
+    visual = "<leader>v", -- keybinding when in visual mode
+	stop = false,         -- or a keybinding, e.g. "<leader>V"
+  },
+  exit_visual = true,     -- exit visual mode after speaking (default `true`)
+}
+```
+
+
