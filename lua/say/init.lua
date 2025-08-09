@@ -57,7 +57,6 @@ function M.toggle_say(text)
 		if stopped then
 			vim.notify("say.nvim: stopped", vim.log.levels.INFO)
 		end
-		return
 	end
 
 	if not (has("say") or has("osascript")) then
