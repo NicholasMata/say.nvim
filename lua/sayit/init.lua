@@ -105,17 +105,35 @@ function M.start(text)
 end
 
 -- Visual selection that handles char, line, and block modes
-local function get_visual_selection()
-	local mode = vim.fn.mode() -- 'v', 'V', or '\022'
+local function get_visual_selection(opts)
+	local mode = vim.fn.mode()
 	local s = vim.fn.getpos("v")
 	local e = vim.fn.getpos(".")
+	-- normalize
+	local srow, scol = s[2], s[3]
+	local erow, ecol = e[2], e[3]
+	if (srow > erow) or (srow == erow and scol > ecol) then
+		srow, erow, scol, ecol = erow, srow, ecol, scol
+	end
 
 	if mode == "V" then
-		local l1 = math.min(s[2], e[2])
-		local l2 = math.max(s[2], e[2])
-		return table.concat(vim.fn.getline(l1, l2), "\n")
+		return table.concat(vim.fn.getline(srow, erow), "\n")
+	elseif mode == "\022" then
+		-- visual block mode
+		local lines = vim.fn.getline(srow, erow)
+		for i, line in ipairs(lines) do
+			-- byte columns: good enough if no tabs/wide chars
+			lines[i] = string.sub(line, scol, ecol)
+		end
+		return table.concat(lines, "\n")
 	else
-		return table.concat(vim.fn.getregion(s, e), "\n")
+		local lines = vim.fn.getline(srow, erow)
+		if #lines == 0 then
+			return ""
+		end
+		lines[1] = string.sub(lines[1], scol)
+		lines[#lines] = string.sub(lines[#lines], 1, ecol)
+		return table.concat(lines, "\n")
 	end
 end
 
