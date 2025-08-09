@@ -1,4 +1,4 @@
-# say.nvim
+# sayit.nvim
 
 Speak the word under the cursor or the current visual selection using macOS Text-to-Speech. 
 Press the same key again to stop (toggle). 
@@ -19,7 +19,7 @@ Works on both Neovim 0.9+ and 0.10+.
 
 ```lua
 {
-  "nicholasmata/say.nvim",
+  "nicholasmata/sayit.nvim",
   opts = {
     mappings = {
       normal = "<leader>v",

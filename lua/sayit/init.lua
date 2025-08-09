@@ -48,47 +48,30 @@ end
 -- Speak text; if something is already speaking, stop instead (toggle)
 function M.toggle_say(text)
 	if not text or text == "" then
-		vim.notify("say.nvim: no text to speak", vim.log.levels.WARN)
+		vim.notify("sayit.nvim: no text to speak", vim.log.levels.WARN)
 		return
 	end
 
 	if state.pid or state.handle then
 		local stopped = M.stop()
 		if stopped then
-			vim.notify("say.nvim: stopped", vim.log.levels.INFO)
+			vim.notify("sayit.nvim: stopped", vim.log.levels.TRACE)
 		end
 	end
 
 	if not (has("say") or has("osascript")) then
-		vim.notify("say.nvim: need `say` or `osascript` on macOS", vim.log.levels.ERROR)
+		vim.notify("sayit.nvim: need `say` or `osascript` on macOS", vim.log.levels.ERROR)
 		return
 	end
 
-	-- Launch speaking job
-	if vim.system then
-		if has("say") then
-			state.handle = vim.system({ "say", text }, { detach = true })
-		else
-			local script = string.format([[say %q]], text)
-			state.handle = vim.system({ "osascript", "-e", script }, { detach = true })
-		end
-		state.pid = state.handle and state.handle.pid or nil
-		state.backend = "system"
-	else
-		if has("say") then
-			state.pid = vim.fn.jobstart({ "say", text }, { detach = true })
-		else
-			local script = string.format([[say %s]], vim.fn.shellescape(text))
-			state.pid = vim.fn.jobstart({ "osascript", "-e", script }, { detach = true })
-		end
-		state.backend = "jobstart"
-	end
+	M.start(text)
 end
 
 -- Always speak (don’t toggle); useful for commands
 function M.start(text)
+	vim.notify("sayit.nvim: saying" .. text, vim.log.levels.TRACE)
 	if not text or text == "" then
-		vim.notify("say.nvim: no text to speak", vim.log.levels.WARN)
+		vim.notify("sayit.nvim: no text to speak", vim.log.levels.WARN)
 		return
 	end
 	-- stop any existing first
@@ -97,7 +80,7 @@ function M.start(text)
 	end
 
 	if not (has("say") or has("osascript")) then
-		vim.notify("say.nvim: need `say` or `osascript` on macOS", vim.log.levels.ERROR)
+		vim.notify("sayit.nvim: need `say` or `osascript` on macOS", vim.log.levels.ERROR)
 		return
 	end
 
@@ -124,8 +107,8 @@ end
 -- Visual selection that handles char, line, and block modes
 local function get_visual_selection()
 	local mode = vim.fn.mode() -- 'v', 'V', or '\022'
-	local s = vim.fn.getpos("'<")
-	local e = vim.fn.getpos("'>")
+	local s = vim.fn.getpos("v")
+	local e = vim.fn.getpos(".")
 
 	if mode == "V" then
 		local l1 = math.min(s[2], e[2])
